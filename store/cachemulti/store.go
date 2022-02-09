@@ -52,6 +52,11 @@ func NewFromKVStore(
 
 	for key, store := range stores {
 		if cms.TracingEnabled() {
+			if cms.traceContext == nil {
+				cms.traceContext = types.TraceContext{}
+			}
+
+			cms.traceContext["store_name"] = key.Name()
 			store = tracekv.NewStore(store.(types.KVStore), cms.traceWriter, cms.traceContext)
 		}
 		if cms.ListeningEnabled(key) {
