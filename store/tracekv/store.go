@@ -188,6 +188,20 @@ func writeOperation(w io.Writer, op operation, tc types.TraceContext, key, value
 	}
 
 	if tc != nil {
+		// we only count committed transactions
+		if _, ok := tc["txHash"]; ok {
+			// if there isn't trace_counter in our trace context
+			// we add it
+			counter := uint64(0)
+			counterRaw, ok := tc["trace_counter"]
+			if !ok {
+				counter = 1
+			} else {
+				counter = counterRaw.(uint64) + 1
+			}
+
+			tc["trace_counter"] = counter
+		}
 		traceOp.Metadata = tc
 	}
 
